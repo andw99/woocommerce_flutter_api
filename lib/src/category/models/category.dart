@@ -52,7 +52,7 @@ class WooProductCategory {
     slug = json['slug'];
     parent = json['parent'];
     description = json['description'];
-    display = json['display'];
+    display = _parseDisplay(json['display']);
     image = json['image'] != null
         ? WooProductCategoryImage.fromJson(json['image'])
         : null;
@@ -70,7 +70,7 @@ class WooProductCategory {
     data['slug'] = slug;
     data['parent'] = parent;
     data['description'] = description;
-    data['display'] = display;
+    data['display'] = display?.toString().split('.').last;
     if (image != null) {
       data['image'] = image!.toJson();
     }
@@ -80,6 +80,18 @@ class WooProductCategory {
       data['_links'] = links!.toJson();
     }
     return data;
+  }
+
+  WooCategoryDisplay? _parseDisplay(String? value) {
+    if (value == null) return null;
+    try {
+      return WooCategoryDisplay.values.firstWhere(
+        (e) => e.toString().split('.').last == value,
+        orElse: () => WooCategoryDisplay.default_,
+      );
+    } catch (_) {
+      return WooCategoryDisplay.default_;
+    }
   }
 
   @override
